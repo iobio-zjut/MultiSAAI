@@ -1,0 +1,86 @@
+{
+    "name": "Eval-genetation",
+    "n_gpu": 1,
+
+    "data_loader": {
+        "type": "Antibody_Antigen_Dataset_AbDab",
+        "args":{
+            "seed": 7,
+            "batch_size": 1,
+            "validation_split": 0,
+            "test_split": 9,
+            "num_workers": 8,
+            "data_dir": "/home/data/user/lvzexin/zexinl/MultiSAAI/ProcessedData/data.csv",
+            "antibody_vocab_dir": "/home/data/user/lvzexin/zexinl/MultiSAAI/ProcessedData/vocab/heavy-2-3.csv",
+            
+            "antibody_tokenizer_dir": "/home/data/user/lvzexin/zexinl/MultiSAAI/checkpoints/ck1/Heavy_roformer",
+            
+            "tokenizer_name": "common",
+            
+            "token_length_list": "2,3",
+            
+            "antigen_seq_name":"antigen",
+            "heavy_seq_name":"Heavy",
+            "light_seq_name":"Light",
+            "label_name":"Label",
+            "heavy_max_len": 140,
+            "light_max_len": 140,
+            "antigen_max_len": 800,
+            
+            "test_antibodys": 1,
+            "shuffle": false
+        }
+    },
+
+    "arch": {
+        "type": "BERTBinding_AbDab_cnn",
+        "args": {
+            "heavy_dir": "/home/data/user/lvzexin/zexinl/MultiSAAI/checkpoints/MultiSAAI/heavymodel",
+            "light_dir": "/home/data/user/lvzexin/zexinl/MultiSAAI/checkpoints/MultiSAAI/lightmodel",
+            "antigen_dir": "/home/data/user/lvzexin/zexinl/MultiSAAI/checkpoints/MultiSAAI/antigenmodel",
+            "emb_dim": 256,
+            "in_channel": 118,
+            "ab_emb_dim": 820,
+            "ag_emb_dim": 692,
+            "h_dim": 512,
+            "n_heads": 2,
+            "output_dim": 2,
+            "dropout": 0.2,
+            "attention": false
+        }
+    },
+    "discriminator_resume": "/home/data/user/lvzexin/zexinl/MultiSAAI/checkpoints/MultiSAAI/model_best.pth",
+
+
+    "optimizer": {
+        "type": "AdamW",
+        "args":{
+            "lr": 8e-6,
+            "weight_decay": 0
+        }
+    },
+    "loss": "bce_withlogits_loss",
+    "is_regression": false,
+    "metrics": [
+        "accuracy", "recall", "roc_auc"
+    ],
+    "lr_scheduler": {
+        "type": "StepLR",
+        "args": {
+            "step_size": 10,
+            "gamma": 0.5
+        }
+    },
+    "trainer": {
+        "epochs": 15,
+        
+        "save_dir": "/home/data/user/lvzexin/zexinl/MultiSAAI/prediction",
+        "save_period": 200,
+        "verbosity": 2,
+        "logging_steps":25,
+        "monitor": "min val_loss",
+        "early_stop": 5,
+
+        "tensorboard": true
+    }
+}
